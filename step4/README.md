@@ -1,6 +1,6 @@
 # Step4. イベントを使う
 
-ここではイベントを使って、更にイベントに応じてModelを変更してみます。
+ここではイベントを使って、イベントに応じてのModel更新をしてみます。
 
 ## 試してみる
 `step4/Event.elm`ファイルを開いて、イベントを使ってみましょう！
@@ -81,7 +81,8 @@ type Bool = True | False
 type Maybe a = Just a | Nothing
 ```
 
-カスタムタイプは`type`で宣言します
+カスタムタイプは`type`で宣言します  
+右辺は値を表し`|`で区切ることによって、複数の値を定義することができ、どれかを値として入れられる
 
 ```
 type Msg
@@ -89,14 +90,15 @@ type Msg
     | ChangeDiv
 ```
 
-- 右辺は値を表し`|`で区切ることによって、複数の値を定義することができ、どれかを値として入れられる
+ここでは
+
 - `Msg`型が取りうるのは、`ChangeInput "xxxxx"`みたいに`String`を与えた`ChangeInput`、または`ChangeDiv`となる
-  - `ChangeInput String`と`ChangeDiv`はコンストラクタとして使える
+  - `ChangeInput String`と`ChangeDiv`はコンストラクタとしても使える
 
 各値が表すのは
 
 - `ChangeInput String`
-  - テキストボックスに文字が入力された時に発生するイベントに対応するMsg
+  - テキストボックスに文字が入力された時に発生するイベントに対応するMsg。`String`は入力された文字列を表す。
 - `ChangeDiv`
   - ボタンをクリックされた時に発生するイベントに対応するMsg
 
@@ -111,7 +113,7 @@ update msg model =
         ChangeInput text ->
             ( { model | inputText = text }, Cmd.none )
 
-        Add ->
+        ChangeDiv ->
             ( { model | divText = model.inputText }, Cmd.none )
 ```
 
@@ -119,8 +121,8 @@ update msg model =
 複数の値を持つカスタムタイプであるMsgを解釈するのに、パターンマッチで`case`を使っています。
 `case`を使う場合は、全ての値について分岐を書く必要があります。
 
-※`_`を使って、それ以外というように書くこともできます。
-
+※何かの場合・次の何かの場合・それ以外、のそれ以外を表す時に`_`を使うという手段はあります。
+            
 ### 新しいModelの生成
 Elmではデータの更新はできません。代わりに新しいデータを作ることになります。
 
@@ -138,26 +140,36 @@ Elmではデータの更新はできません。代わりに新しいデータ�
 - テキストボックスに入力された時に発生するイベント
 
 ### ボタンをクリックされた時に発生するイベント 
-このイベントは`onClick`関数で表現します。
+このイベントは[onClick](https://package.elm-lang.org/packages/elm/html/latest/Html-Events#onClick)関数で表現します。
 
-なおイベントは属性に設定します。
+イベントは属性に設定します。
 
 ```
-button [ onClick Add ] [ text "クリック" ]
+button [ onClick ChangeDiv ] [ text "クリック" ]
 ```
 
-`onClick`関数は`Msg`を引数に受け取るので、`Msg`の`ChangeDiv`を渡します。
+```
+-- onClickの型注釈
+onClick : msg -> Attribute msg
+```
 
-ボタンがクリックされると、`ChangeDiv`が`update`関数に渡されます。
+`onClick`関数は`msg`を引数に受け取るので、`Msg`の`ChangeDiv`を渡しています。
+これによりボタンがクリックされると、`ChangeDiv`が`update`関数に渡されます。
 
 ### テキストボックスに文字入力された時に発生するイベント
-このイベントは`onInput`関数で実現します。
+このイベントは[onInput](https://package.elm-lang.org/packages/elm/html/latest/Html-Events#onInput)関数で実現します。
 
 ```
 input [ onInput ChangeInput ] []
 ```
 
-`onInput`関数は、`String -> Msg`という関数を引数に受け取ります。
+```
+-- onInputの型注釈
+onInput : (String -> msg) -> Attribute msg
+```
+
+`onInput`関数は、`String -> msg`という関数を引数に受け取ります。  
+入力された値を使って`任意の型msg`を返す関数です。  
 `Msg`の`ChangeInput String`コンストラクタもこの関数に該当するので、`ChangeInput`を渡しています。
 
 これにより何か文字を入力する度に、`ChangeInput`が`update`関数に渡されます。
@@ -179,7 +191,6 @@ import Html exposing (Html, button, div, input, table, tbody, td, text, th, thea
 import Html.Attributes exposing (attribute)
 import Html.Events exposing (onClick, onInput)
 ```
-
 
 ### `module`
 `module`でこのファイルのモジュール名を宣言し、`exposing ()`のカッコ内で他のモジュールに公開する型と関数を宣言します。
