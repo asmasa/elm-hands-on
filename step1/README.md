@@ -58,7 +58,7 @@ view model =
 - `Html Msg`とは？となると思いますが、ここではHTML要素を表す型と理解して下さい。  
   - `text`関数に`String`型を渡すと、HTML上ではplain textを表すHTML要素を返します。
 
-引数が2個の関数の場合は以下となります。
+- 引数が2個の関数の場合は以下となります。
 
 ```
 add : Int -> Int -> Int
